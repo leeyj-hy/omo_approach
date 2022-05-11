@@ -2,6 +2,7 @@
 #include "robot_msgs/omoapproach.h"
 #include "geometry_msgs/Twist.h"
 #include "fiducial_msgs/FiducialTransformArray.h"
+#include "std_msgs/Float32.h"
 
 using namespace std;
 using namespace ros;
@@ -19,7 +20,7 @@ class omo_approach
         geometry_msgs::Twist Omo_x_vel;
 
         float z_dist;
-        float z_tol = 0.25;
+        float z_tol = 0;
         float lin_vel = 0.1;
         bool omo_enabler = false;
         
@@ -39,12 +40,21 @@ class omo_approach
         bool is_omo_dist(robot_msgs::omoapproach::Request &req,
                          robot_msgs::omoapproach::Response &res)
         {
-            omo_enabler = true;
-            if(omo_enabler == false)
+            z_tol = req.z_goal;
+
+            if(z_tol < 0.1)
             {
+                ROS_ERROR("Requested z_dist is too close to marker! Unable to start 'omo_approach' node.");
+                return -1;
+            }
+
+            omo_enabler = true;
+
+            // if(omo_enabler == false)
+            // {
                 res.is_z_reached = true;
                 return true;
-            }
+            // }
             
             
         }
